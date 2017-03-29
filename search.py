@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -18,6 +18,8 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import node
+import sets
 
 class SearchProblem:
     """
@@ -81,18 +83,72 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    root_node = node.Node(problem.getStartState())
+
+    frontier = util.Stack()
+    frontier.push(root_node)
+    explored = sets.Set()
+    end_node = None
+
+    while not frontier.isEmpty():
+
+        # choose a leaf node and remove it from the frontier
+        leaf_node = frontier.pop()
+
+        # if the node contains a goal state then return the corresponding solution
+        if problem.isGoalState(leaf_node.get_state()):
+            end_node = leaf_node
+            break
+
+        # add the node to the explored set
+        explored.add(leaf_node.get_state())
+
+        # expand the chosen node, adding the resulting nodes to the frontier
+        for successor, action, cost in problem.getSuccessors(leaf_node.get_state()):
+
+            if successor not in explored:
+                child_node = node.Node(successor)
+                child_node.set_parent(leaf_node)
+                child_node.set_action(action)
+                child_node.add_cost(cost)
+
+                frontier.push(child_node)
+
+    return end_node.path()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    root_node = node.Node(problem.getStartState())
+    frontier = [root_node]
+    explored = sets.Set()
+    end_node = None
+
+    while len(frontier) > 0:
+
+        # choose a leaf node and remove it from the frontier
+        leaf_node = frontier.pop()
+
+        # if the node contains a goal state then return the corresponding solution
+        if problem.isGoalState(leaf_node.get_state()):
+            end_node = leaf_node
+            break
+
+        # add the node to the explored set
+        explored.add(leaf_node.get_state())
+
+        # expand the chosen node, adding the resulting nodes to the frontier
+        for successor, action, cost in problem.getSuccessors(leaf_node.get_state()):
+
+            child_node = node.Node(successor)
+            child_node.set_parent(leaf_node)
+            child_node.set_action(action)
+            child_node.add_cost(cost)
+
+            if not (successor in explored or child_node in frontier):
+                frontier.insert(0, child_node)
+
+    return end_node.path()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
