@@ -102,17 +102,18 @@ def depthFirstSearch(problem):
             break
 
         # add the node to the explored set
-        explored.add(leaf_node.get_state())
+        explored.add(leaf_node)
 
         # expand the chosen node, adding the resulting nodes to the frontier
         for successor, action, cost in problem.getSuccessors(leaf_node.get_state()):
 
-            if successor not in explored:
-                child_node = node.Node(successor)
-                child_node.set_parent(leaf_node)
-                child_node.set_action(action)
-                child_node.add_cost(cost)
+            child_node = node.Node(successor)
+            child_node.set_parent(leaf_node)
+            child_node.set_action(action)
+            child_node.add_cost(cost)
 
+            # TODO: if checking child node in frontier this fails, if not (child_node in explored or child_node in frontier):
+            if not (child_node in explored):
                 frontier.push(child_node)
 
     return end_node.path()
@@ -120,11 +121,12 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     root_node = node.Node(problem.getStartState())
-    frontier = [root_node]
+    frontier = util.Queue()
+    frontier.push(root_node)
     explored = sets.Set()
     end_node = None
 
-    while len(frontier) > 0:
+    while not frontier.isEmpty():
 
         # choose a leaf node and remove it from the frontier
         leaf_node = frontier.pop()
@@ -135,7 +137,7 @@ def breadthFirstSearch(problem):
             break
 
         # add the node to the explored set
-        explored.add(leaf_node.get_state())
+        explored.add(leaf_node)
 
         # expand the chosen node, adding the resulting nodes to the frontier
         for successor, action, cost in problem.getSuccessors(leaf_node.get_state()):
@@ -145,8 +147,8 @@ def breadthFirstSearch(problem):
             child_node.set_action(action)
             child_node.add_cost(cost)
 
-            if not (successor in explored or child_node in frontier):
-                frontier.insert(0, child_node)
+            if not (child_node in explored or child_node in frontier):
+                frontier.push(child_node)
 
     return end_node.path()
 
