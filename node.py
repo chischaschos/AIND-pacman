@@ -22,6 +22,9 @@ class Node:
     def add_cost(self, cost):
         self.cost += cost
 
+    def get_cost(self):
+        return self.cost
+
     def get_state(self):
         return self.value
 
