@@ -20,6 +20,7 @@ Pacman agents (in searchAgents.py).
 import util
 import node
 import sets
+import searchAgents
 
 class SearchProblem:
     """
@@ -197,10 +198,54 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+# def manhattanHeuristic(position, problem, info={}):
+#     "The Manhattan distance heuristic for a PositionSearchProblem"
+#     xy1 = position
+#     xy2 = problem.goal
+#     return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+# def euclideanHeuristic(position, problem, info={}):
+#     "The Euclidean distance heuristic for a PositionSearchProblem"
+#     xy1 = position
+#     xy2 = problem.goal
+#     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    root_node = node.Node(problem.getStartState())
+    frontier = util.PriorityQueue()
+    frontier.push(root_node, 0)
+    explored = sets.Set()
+    end_node = None
+
+    while not frontier.isEmpty():
+        # choose a leaf node and remove it from the frontier
+        leaf_node = frontier.pop()
+
+        # if the node contains a goal state then return the corresponding solution
+        if problem.isGoalState(leaf_node.get_state()):
+            end_node = leaf_node
+            break
+
+        # add the node to the explored set
+        explored.add(leaf_node)
+
+        # expand the chosen node, adding the resulting nodes to the frontier
+        for successor, action, cost in problem.getSuccessors(leaf_node.get_state()):
+
+            child_node = node.Node(successor)
+            child_node.set_parent(leaf_node)
+            child_node.set_action(action)
+            child_node.add_cost(cost)
+            child_node.add_cost(leaf_node.get_cost())
+
+            if not (child_node in explored or child_node in frontier):
+                frontier.push(child_node, child_node.get_cost() + searchAgents.manhattanHeuristic(child_node.get_state(), problem))
+
+            elif child_node in frontier:
+                frontier.update(child_node, child_node.get_cost() + searchAgents.manhattanHeuristic(child_node.get_state(), problem))
+
+    return end_node.path()
 
 
 # Abbreviations
