@@ -20,7 +20,6 @@ Pacman agents (in searchAgents.py).
 import util
 import node
 import sets
-import searchAgents
 
 class SearchProblem:
     """
@@ -240,10 +239,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             child_node.add_cost(leaf_node.get_cost())
 
             if not (child_node in explored or child_node in frontier):
-                frontier.push(child_node, child_node.get_cost() + searchAgents.manhattanHeuristic(child_node.get_state(), problem))
+                frontier.push(child_node, child_node.get_cost() + heuristic(child_node.get_state(), problem))
 
             elif child_node in frontier:
-                frontier.update(child_node, child_node.get_cost() + searchAgents.manhattanHeuristic(child_node.get_state(), problem))
+                frontier.update(child_node, child_node.get_cost() + heuristic(child_node.get_state(), problem))
 
     return end_node.path()
 
