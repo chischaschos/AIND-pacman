@@ -23,8 +23,6 @@ pacmanAgents.py
 pacmanAgents.pyc
 projectParams.py
 projectParams.pyc
-searchAgents.py
-searchAgents.pyc
 searchTestClasses.py
 searchTestClasses.pyc
 submission_autograder.py
