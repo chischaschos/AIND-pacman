@@ -150,7 +150,6 @@ def breadthFirstSearch(problem):
             if not (child_node in explored or child_node in frontier):
                 frontier.push(child_node)
 
-    print(end_node.path())
     return end_node.path()
 
 def uniformCostSearch(problem):

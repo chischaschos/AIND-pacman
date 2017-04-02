@@ -307,7 +307,6 @@ class CornersProblem(search.SearchProblem):
         It is a goal state if state is a corner and all other corner are in the
         path to state.
         """
-        # pdb.set_trace()
         if state.position in self.corners:
             self.coveredCorners.add(state.position)
 
@@ -332,7 +331,11 @@ class CornersProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
+
                 nextState = MyGameState((nextx, nexty))
+
+                if nextState.position in self.corners:
+                    self.coveredCorners.add(nextState.position)
 
                 successors.append((nextState, action, 1))
 
