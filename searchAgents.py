@@ -40,6 +40,9 @@ from game import Actions
 import util
 import time
 import search
+import pdb
+import sets
+from myGameState import *
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -288,41 +291,30 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-
-        # For display purposes
-        # self.visualize = True
-        # self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
+        self.coveredCorners = sets.Set()
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
-
-        I suppose that this has to be changing every time that one corner is found
         """
-        # return self.corners[0]
-        return self.startingPosition
+        return MyGameState(self.startingPosition)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
 
-        I suppose that the corner are the goal state and they are varying every time we
-        found a new one. So we need to keep track of the found ones.
+        It is a goal state if state is a corner and all other corner are in the
+        path to state.
         """
-        goal = self.corners[1]
-        isGoal = state == goal
+        # pdb.set_trace()
+        if state.position in self.corners:
+            self.coveredCorners.add(state.position)
 
-        # For display purposes only
-        # if isGoal and self.visualize:
-        #     self._visitedlist.append(state)
-        #     import __main__
-        #     if '_display' in dir(__main__):
-        #         if 'drawExpandedCells' in dir(__main__._display): #@UndefinedVariable
-        #             __main__._display.drawExpandedCells(self._visitedlist) #@UndefinedVariable
+        if len(self.coveredCorners) == 4:
+            return True
 
-        return isGoal
-
+        return False
 
     def getSuccessors(self, state):
         """
@@ -334,23 +326,18 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            x,y = state
+            x,y = state.position
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
-                nextState = (nextx, nexty)
-                # cost = self.costFn(nextState)
-                cost = 1
-                successors.append( ( nextState, action, cost) )
+                nextState = MyGameState((nextx, nexty))
+
+                successors.append((nextState, action, 1))
 
         # Bookkeeping for display purposes
         self._expanded += 1 # DO NOT CHANGE
-        # if state not in self._visited:
-        #     self._visited[state] = True
-        #     self._visitedlist.append(state)
 
         return successors
 
@@ -366,7 +353,6 @@ class CornersProblem(search.SearchProblem):
             x, y = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
         return len(actions)
-
 
 def cornersHeuristic(state, problem):
     """
