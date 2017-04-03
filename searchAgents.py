@@ -291,14 +291,16 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.coveredCorners = sets.Set()
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return MyGameState(self.startingPosition)
+        state = MyGameState(self.startingPosition)
+        state.updateCorners(self.corners)
+
+        return state
 
     def isGoalState(self, state):
         """
@@ -307,13 +309,7 @@ class CornersProblem(search.SearchProblem):
         It is a goal state if state is a corner and all other corner are in the
         path to state.
         """
-        if state.position in self.corners:
-            self.coveredCorners.add(state.position)
-
-        if len(self.coveredCorners) == 4:
-            return True
-
-        return False
+        return state.areCornersCovered()
 
     def getSuccessors(self, state):
         """
@@ -326,16 +322,15 @@ class CornersProblem(search.SearchProblem):
             is the incremental cost of expanding to that successor
         """
         successors = []
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x,y = state.position
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+
             if not self.walls[nextx][nexty]:
-
                 nextState = MyGameState((nextx, nexty))
-
-                if nextState.position in self.corners:
-                    self.coveredCorners.add(nextState.position)
+                nextState.updateCorners(state.corners)
 
                 successors.append((nextState, action, 1))
 
